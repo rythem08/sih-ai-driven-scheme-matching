@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   IndianRupee,
   Briefcase,
@@ -8,7 +8,9 @@ import {
   UserCheck,
   ArrowRight,
   RotateCcw,
-  Zap
+  Zap,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -86,6 +88,9 @@ function formatLakhs(num) {
 
 export default function IntakeForm({ formData, setFormData, onSubmit, isLoading, onReset }) {
   const { t } = useLanguage();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState(null); // null | 'submitting' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
 
   const PROJECT_TYPE_OPTIONS = [
     { value: 'small_business', label: t('cat_small_business'), icon: '🏪' },
@@ -118,9 +123,19 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
     setFormData(presetData);
   };
 
+  const handleResetClick = () => {
+    setSubmissionStatus(null);
+    setErrorMessage('');
+    if (onReset) {
+      onReset();
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmissionStatus('submitting');
+    setErrorMessage('');
 
     try {
       const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
@@ -129,10 +144,28 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      let result = null;
+      try {
+        result = await response.json();
+      } catch {
+        result = await response.text();
+      }
+
       console.log('Submission successful:', result);
+      setSubmissionStatus('success');
+
+      // Handle success: advance UI step or reset form
+      if (onSubmit) {
+        await onSubmit(formData);
+      } else if (onReset) {
+        onReset();
+      }
     } catch (error) {
       console.error('Submission failed:', error);
+      setSubmissionStatus('error');
+      setErrorMessage(error.message || 'Submission failed. Please check your connection or endpoint.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -153,7 +186,7 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
 
           <button
             type="button"
-            onClick={onReset}
+            onClick={handleResetClick}
             className="flex items-center space-x-1 text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors cursor-pointer"
             title="Reset form to default values"
           >
@@ -381,17 +414,53 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
           </div>
         </div>
 
+        {/* Submission Status Indicator */}
+        {submissionStatus === 'submitting' && (
+          <div
+            id="submission-status-indicator"
+            className="flex items-center space-x-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl animate-pulse"
+          >
+            <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0" />
+            <span>Submitting form data to Google Apps Script...</span>
+          </div>
+        )}
+
+        {submissionStatus === 'success' && (
+          <div
+            id="submission-status-indicator"
+            className="flex items-center space-x-2 text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Form submitted successfully! Advancing step...</span>
+          </div>
+        )}
+
+        {submissionStatus === 'error' && (
+          <div
+            id="submission-status-indicator"
+            className="flex items-start space-x-2 text-xs text-rose-300 bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl"
+          >
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <span className="font-semibold">Submission failed:</span> {errorMessage}
+              <div className="text-[11px] text-rose-400/80 mt-0.5">
+                Verify that your Google Apps Script endpoint URL is accessible and allows CORS/anonymous execution.
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"
           id="btn-evaluate"
-          disabled={isLoading}
+          disabled={isLoading || isSubmitting}
           className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/40 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {isLoading ? (
+          {isLoading || isSubmitting ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>{t('intake_evaluating')}</span>
+              <span>{isSubmitting ? 'Submitting to Google Script...' : t('intake_evaluating')}</span>
             </>
           ) : (
             <>

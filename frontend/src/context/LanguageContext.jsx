@@ -105,7 +105,7 @@ export const TRANSLATIONS = {
     partner_health_score: 'Health Score:',
     partner_call_branch: 'Call Branch',
     partner_send_details: 'Send My Details to This Partner',
-    partner_routed_badge: 'Routed via n8n!',
+    partner_routed_badge: 'Routed Successfully!',
     partner_use_gps: 'My GPS',
 
     // Confirmation Screen
@@ -227,7 +227,7 @@ export const TRANSLATIONS = {
     partner_health_score: 'संस्थागत स्कोर:',
     partner_call_branch: 'शाखा को कॉल करें',
     partner_send_details: 'मेरा विवरण इस भागीदार को भेजें',
-    partner_routed_badge: 'n8n द्वारा प्रेषित!',
+    partner_routed_badge: 'सफलतापूर्वक प्रेषित!',
     partner_use_gps: 'मेरा जीपीएस',
 
     // Confirmation Screen
