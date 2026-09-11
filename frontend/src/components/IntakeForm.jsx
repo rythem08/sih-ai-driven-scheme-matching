@@ -130,40 +130,42 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
       onReset();
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsSubmitting(true);
     setSubmissionStatus('submitting');
     setErrorMessage('');
 
     try {
-      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        'https://rythemk.app.n8n.cloud/webhook-test/scheme-form',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
-      let result = null;
-      try {
-        result = await response.json();
-      } catch {
-        result = await response.text();
-      }
+      const result = await response.json();
 
       console.log('Submission successful:', result);
       setSubmissionStatus('success');
 
-      // Handle success: advance UI step or reset form
       if (onSubmit) {
         await onSubmit(formData);
       } else if (onReset) {
         onReset();
       }
+
     } catch (error) {
       console.error('Submission failed:', error);
       setSubmissionStatus('error');
-      setErrorMessage(error.message || 'Submission failed. Please check your connection or endpoint.');
+      setErrorMessage(
+        error.message || 'Submission failed. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -421,7 +423,7 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
             className="flex items-center space-x-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl animate-pulse"
           >
             <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0" />
-            <span>Submitting form data to Google Apps Script...</span>
+            <span>Submitting your information...</span>
           </div>
         )}
 
@@ -444,7 +446,7 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
             <div className="flex-1">
               <span className="font-semibold">Submission failed:</span> {errorMessage}
               <div className="text-[11px] text-rose-400/80 mt-0.5">
-                Verify that your Google Apps Script endpoint URL is accessible and allows CORS/anonymous execution.
+                Please check your connection and try again.
               </div>
             </div>
           </div>
@@ -460,7 +462,7 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
           {isLoading || isSubmitting ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>{isSubmitting ? 'Submitting to Google Script...' : t('intake_evaluating')}</span>
+              <span>{isSubmitting ? 'Submitting...' : t('intake_evaluating')}</span>
             </>
           ) : (
             <>
