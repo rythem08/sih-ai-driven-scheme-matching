@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  IndianRupee, 
-  Briefcase, 
-  GraduationCap, 
-  Clock, 
-  Sliders, 
-  UserCheck, 
-  ArrowRight, 
+import {
+  IndianRupee,
+  Briefcase,
+  GraduationCap,
+  Clock,
+  Sliders,
+  UserCheck,
+  ArrowRight,
   RotateCcw,
   Zap
 } from 'lucide-react';
@@ -118,8 +118,25 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
     setFormData(presetData);
   };
 
+  const triggerN8nWorkflow = async (data) => {
+    try {
+      fetch('https://rythemk.app.n8n.cloud/webhook-test/5ce5a8f9-87be-482a-943f-6e7952854098', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          submittedAt: new Date().toISOString(),
+          source: 'Vercel Web App',
+        }),
+      });
+    } catch (err) {
+      console.error('n8n trigger error:', err);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    triggerN8nWorkflow(formData);
     onSubmit();
   };
 
@@ -357,11 +374,10 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
                 key={g.id}
                 type="button"
                 onClick={() => handleChange('gender', g.id)}
-                className={`py-2 px-2.5 rounded-xl text-xs font-medium border transition-all text-center cursor-pointer ${
-                  formData.gender === g.id
+                className={`py-2 px-2.5 rounded-xl text-xs font-medium border transition-all text-center cursor-pointer ${formData.gender === g.id
                     ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/60 font-semibold'
                     : 'bg-slate-950/50 text-slate-400 border-slate-800 hover:border-slate-700'
-                }`}
+                  }`}
               >
                 {g.label}
               </button>
