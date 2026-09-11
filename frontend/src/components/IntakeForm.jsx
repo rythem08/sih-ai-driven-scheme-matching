@@ -149,7 +149,13 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
         }
       );
 
-      const result = await response.json();
+      let result = null;
+
+      try {
+        result = await response.json();
+      } catch {
+        result = await response.text();
+      }
 
       console.log('Submission successful:', result);
       setSubmissionStatus('success');
