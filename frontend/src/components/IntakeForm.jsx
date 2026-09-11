@@ -118,26 +118,22 @@ export default function IntakeForm({ formData, setFormData, onSubmit, isLoading,
     setFormData(presetData);
   };
 
-  const triggerN8nWorkflow = async (data) => {
-    try {
-      fetch('https://rythemk.app.n8n.cloud/webhook/5ce5a8f9-87be-482a-943f-6e7952854098](https://rythemk.app.n8n.cloud/webhook/5ce5a8f9-87be-482a-943f-6e7952854098', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          submittedAt: new Date().toISOString(),
-          source: 'Vercel Web App',
-        }),
-      });
-    } catch (err) {
-      console.error('n8n trigger error:', err);
-    }
-  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    triggerN8nWorkflow(formData);
-    onSubmit();
+
+    try {
+      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      console.log('Submission successful:', result);
+    } catch (error) {
+      console.error('Submission failed:', error);
+    }
   };
 
   return (
