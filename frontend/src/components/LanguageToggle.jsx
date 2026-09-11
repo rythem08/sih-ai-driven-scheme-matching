@@ -3,7 +3,7 @@ import React from 'react';
 export default function LanguageToggle({ currentLang = 'en', onToggle }) {
   return (
     <div className="relative inline-flex items-center shrink-0">
-      <span className="absolute left-2 text-xs pointer-events-none text-slate-400">
+      <span className="absolute left-2 text-xs pointer-events-none text-slate-400 z-10">
         🌐
       </span>
       <select
