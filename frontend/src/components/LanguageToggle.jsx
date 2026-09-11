@@ -33,11 +33,7 @@ export default function LanguageToggle({
       <select
         value={activeLang}
         onChange={(e) => handleToggle && handleToggle(e.target.value)}
-        className="hidden sm:block pl-7 pr-3 py-1.5 bg-slate-800 
-                   border border-slate-700 rounded-lg text-xs 
-                   font-medium text-white appearance-none cursor-pointer 
-                   focus:outline-none focus:border-emerald-500 
-                   touch-manipulation z-0"
+        className="pl-7 pr-1.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-emerald-500 touch-manipulation z-0 max-w-[90px] sm:max-w-none"
       >
         <option value="en" className="bg-slate-900 text-white">English</option>
         <option value="hi" className="bg-slate-900 text-white">हिंदी</option>
