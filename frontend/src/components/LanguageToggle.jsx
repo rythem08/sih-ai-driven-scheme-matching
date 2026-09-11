@@ -1,22 +1,19 @@
 import React from 'react';
-import { Languages, Globe } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 
-export default function LanguageToggle() {
-  const { language, toggleLanguage } = useLanguage();
-
+export default function LanguageToggle({ currentLang = 'en', onToggle }) {
   return (
-    <button
-      type="button"
-      onClick={toggleLanguage}
-      className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-bold transition shadow-sm hover:border-emerald-500/50 cursor-pointer"
-      title={language === 'en' ? 'हिंदी में बदलें' : 'Switch to English'}
-    >
-      <Languages className="w-3.5 h-3.5 text-emerald-400" />
-      <span>{language === 'en' ? 'English' : 'हिंदी'}</span>
-      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/40">
-        {language === 'en' ? 'हिंदी' : 'EN'}
+    <div className="relative inline-flex items-center shrink-0">
+      <span className="absolute left-2 text-xs pointer-events-none text-slate-400">
+        🌐
       </span>
-    </button>
+      <select
+        value={currentLang}
+        onChange={(e) => onToggle && onToggle(e.target.value)}
+        className="pl-6 pr-2 py-1 bg-slate-800 border border-slate-700 rounded-lg text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-emerald-500"
+      >
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+      </select>
+    </div>
   );
 }
